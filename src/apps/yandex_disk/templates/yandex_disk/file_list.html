@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список файлов</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Список доступных ресурсов</h1>
+        <form action="{% url 'file_list' %}" method="get">
+            <div class="filters-section">
+                <label for="filter">Фильтр:</label>
+                <select id="filter" name="filter" onchange="this.form.submit()">
+                    <option value="all" {% if filter_mode == "all" %}selected{% endif %}>Все элементы</option>
+                    <option value="folders" {% if filter_mode == "folders" %}selected{% endif %}>Только папки</option>
+                    <option value="files" {% if filter_mode == "files" %}selected{% endif %}>Только файлы</option>
+                    <option value="images" {% if filter_mode == "images" %}selected{% endif %}>Только изображения</option>
+                    <option value="documents" {% if filter_mode == "documents" %}selected{% endif %}>Только документы</option>
+                    <option value="archives" {% if filter_mode == "archives" %}selected{% endif %}>Только архивы</option>
+                    <option value="videos" {% if filter_mode == "videos" %}selected{% endif %}>Только видео</option>
+                    <option value="audio" {% if filter_mode == "audio" %}selected{% endif %}>Только аудио</option>
+                </select>
+            </div>
+        </form>
+        
+        <form action="{% url 'download_files' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="current_filter" value="{{ filter_mode }}">
+            <div class="table-section">
+                <table border="1" class="resource-table">
+                    <thead>
+                        <tr>
+                            <th>Выбрать</th>
+                            <th>Имя</th>
+                            <th>Тип</th>
+                            <th>Путь</th>
+                            <th>Дата создания</th>
+                            <th>Дата изменения</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for resource in resources %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="selected_files" value="{{ forloop.counter0 }}">
+                                </td>
+                                <td>{{ resource.name }}</td>
+                                <td>{{ resource.type }}</td>
+                                <td>{{ resource.path }}</td>
+                                <td>{{ resource.created }}</td>
+                                <td>{{ resource.modified }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="actions-section">
+                <button type="submit" class="download-button">Скачать выбранные файлы</button>
+            </div>
+        </form>
+        <br>
+        <a href="{% url 'index' %}">Вернуться</a>
+    </div>
+</body>
+</html>
